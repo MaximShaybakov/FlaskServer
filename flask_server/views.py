@@ -4,7 +4,7 @@ from flask.views import MethodView
 from sqlalchemy.exc import IntegrityError
 from data_base.models import User, Ads, Session
 from errors import HttpError
-from validators import CreateUserShema, PatchUserShema, validate
+from validators import CreateUserShema, PatchUserShema, CreateAdsShema, PatchAdsShema, validate
 from typing import Type
 
 
