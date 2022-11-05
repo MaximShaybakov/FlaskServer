@@ -39,6 +39,3 @@ class Ads(Base):
 
     def __repr__(self):
         return f'Ads "{self.title[:20]}"'
-
-
-Base.metadata.create_all(engine)
