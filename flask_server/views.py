@@ -8,22 +8,23 @@ from validators import CreateUserShema, PatchUserShema, validate
 from typing import Type
 
 
-def get_user_id(user_id: int, orm_model: Type[User], session: Session):
-    with Session() as session:
-        orm_item = session.query(orm_model).get(user_id)
-        if orm_item is None:
-            raise HttpError(404, 'item not found')
-        return orm_item
-
-
 class UserView(MethodView):
 
-    def get(self, user_id):
+    @classmethod
+    def get_user_id(user_id: int, orm_model: Type[User], session: Session):
         with Session() as session:
             orm_item = session.query(orm_model).get(user_id)
             if orm_item is None:
                 raise HttpError(404, 'item not found')
             return orm_item
+
+    def get(self, user_id: int):
+        with Session() as session:
+            user = get_user_id(user_id, User, session)
+            return jsonify({'user_id': user.id,
+                            'user_name': user.name,
+                            'creation_time': user.creation_time.isoformat(),
+                            'user_email': user.email})
 
     def post(self):
         json_data = request.json
