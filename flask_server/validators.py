@@ -26,11 +26,6 @@ class CreateUserShema(pydantic.BaseModel):
             raise ValueError('name mast be less then 2 chars')
         return value
 
-    @pydantic.validator('email')
-    def check_mail(self, value: str):
-        if not re.search(self.email_regex, value):
-            raise ValueError('invalid email')
-
     @pydantic.validator('password')
     def check_password(cls, value: str):
         if not re.search(self.password_regex, value):
@@ -39,6 +34,11 @@ class CreateUserShema(pydantic.BaseModel):
         value = bcrypt.generate_password_hash(value)
         value = value.decode()
         return value
+
+    @pydantic.validator('email')
+    def check_mail(cls, value: str):
+        if not re.search(self.email_regex, value):
+            raise ValueError('invalid email')
 
 
 class PatchUserShema(pydantic.BaseModel):
@@ -69,8 +69,9 @@ def validate(data_to_validate: dict, validation_class: Type[CreateUserShema] | T
 
 
 class CreateAdsShema(pydantic.BaseModel):
-    title: str
-    content: str
+    title: Optional[str]
+    content: Optional[str]
+
 
     @pydantic.validator('title')
     def check_title(cls, value: str):
@@ -89,7 +90,7 @@ class PatchAdsShema(pydantic.BaseModel):
     title: Optional[str]
     content: Optional[str]
 
-    @pydantic.validator('name')
+    @pydantic.validator('title')
     def check_name(cls, value: str):
         if len(value) > 50:
             raise ValueError('name mast be less then 32 chars')

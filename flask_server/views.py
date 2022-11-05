@@ -1,9 +1,11 @@
 from main import app
+from flask import jsonify
 from flask.views import MethodView
 from sqlalchemy.exc import IntegrityError
 from data_base.models import User, Ads, Session
 from errors import HttpError
-from validators import CreateUserShema, PatchUserShema
+from validators import CreateUserShema, PatchUserShema, validate
+from typing import Type
 
 
 def get_user_id(user_id: int, orm_model: Type[User], session: Session):
@@ -27,7 +29,7 @@ class UserView(MethodView):
         json_data = request.json
         with Session() as session:
             try:
-                new_user = UserModel(**validate(json_data, CreateUserShema))
+                new_user = User(**validate(json_data, CreateUserShema))
                 session.add(new_user)
                 session.commit()
             except IntegrityError:
