@@ -1,5 +1,5 @@
 from main import app
-from flask import jsonify
+from flask import jsonify, request
 from flask.views import MethodView
 from sqlalchemy.exc import IntegrityError
 from data_base.models import User, Ads, Session
