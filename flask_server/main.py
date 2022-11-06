@@ -1,10 +1,6 @@
-from gen_variables import app, bcrypt
-from errors import HttpError, error_handler
-from data_base.models import Base, Session, User, Ads, engine
-from validators import CreateUserShema, CreateAdsShema, PatchUserShema, PatchAdsShema, \
-    validate, validate_ads, Type
-from views import UserView, AdsView, get_user_id, get_ads_id
-from urls import *
+from gen_variables import app
+from data_base.models import Base, engine
+import urls
 
 
 if __name__ == '__main__':

@@ -21,9 +21,8 @@ class UserView(MethodView):
         with Session() as session:
             user = get_user_id(user_id, User, session)
             return jsonify(user_id=user.id,
-                            user_name=user.name,
-                            creation_time=user.creation_time.isoformat(),
-                            user_email=user.email)
+                           user_name=user.name,
+                           user_email=user.email)
 
     def post(self):
         json_data = request.json
@@ -67,8 +66,8 @@ class AdsView(MethodView):
         with Session() as session:
             ads = get_ads_id(ads_id, Ads, session)
             return jsonify(ads_id=ads.id,
-                            ads_title=ads.title,
-                            creation_time=ads.creation_time.isoformat())
+                           ads_title=ads.title,
+                           creation_time=ads.creation_time.isoformat())
 
     def post(self):
         json_data = request.json

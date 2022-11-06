@@ -2,6 +2,7 @@ import pydantic
 from typing import Type, Optional
 import re
 from gen_variables import bcrypt
+from errors import HttpError
 
 
 password_regex = re.compile(r'^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=*_!-]).*$')
@@ -30,7 +31,7 @@ class CreateUserShema(pydantic.BaseModel):
         return value
 
     @pydantic.validator('email')
-    def check_mail(cls, value: str):
+    def check_email(cls, value: str):
         if not re.search(email_regex, value):
             raise ValueError('invalid email')
         return value
@@ -40,6 +41,7 @@ class PatchUserShema(pydantic.BaseModel):
 
     name: Optional[str]
     password: Optional[str]
+    email: Optional[str]
 
     @pydantic.validator('name')
     def check_name(cls, value: str):
@@ -54,6 +56,12 @@ class PatchUserShema(pydantic.BaseModel):
         value = value.encode()
         value = bcrypt.generate_password_hash(value)
         value = value.decode()
+        return value
+
+    @pydantic.validator('email')
+    def check_email(cls, value: str):
+        if not re.search(email_regex, value):
+            raise ValueError('invalid email')
         return value
 
 
