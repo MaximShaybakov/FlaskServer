@@ -1,7 +1,11 @@
-from flask import Flask
-from data_base.models import Base, engine
+from gen_variables import app, bcrypt
+from errors import HttpError, error_handler
+from data_base.models import Base, Session, User, Ads, engine
+from validators import CreateUserShema, CreateAdsShema, PatchUserShema, PatchAdsShema, \
+    validate, validate_ads, Type
+from views import UserView, AdsView, get_user_id, get_ads_id
+from urls import *
 
-app = Flask('app')
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
