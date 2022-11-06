@@ -1,4 +1,4 @@
-from main import app
+from gen_variables import app
 from flask import jsonify
 
 
@@ -12,4 +12,4 @@ class HttpError(Exception):
 def error_handler(error: HttpError):
     response = jsonify({'status': 'error', 'message': error.message})
     response.status_code = error.status_code
-    return  response
+    return response

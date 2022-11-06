@@ -1,24 +1,18 @@
-import re
-import bcrypt
 import pydantic
 from typing import Type, Optional
-from flask_bcrypt import Bcrypt
-from main import app
+import re
+from gen_variables import bcrypt
 
 
-
-bcrypt = Bcrypt(app)
+password_regex = re.compile(r'^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=*_!-]).*$')
+email_regex = re.compile(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
 
 
 class CreateUserShema(pydantic.BaseModel):
 
-    def __init__(self):
-        self.password_regex = re.compile(r'^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=*_!-]).*$')
-        self.email_regex = re.compile(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
-
     name: str
     password: str
-    email: str
+    email: Optional[str]
 
     @pydantic.validator('name')
     def check_name(cls, value: str):
@@ -28,7 +22,7 @@ class CreateUserShema(pydantic.BaseModel):
 
     @pydantic.validator('password')
     def check_password(cls, value: str):
-        if not re.search(self.password_regex, value):
+        if not re.search(password_regex, value):
             raise ValueError('password is to easy')
         value = value.encode()
         value = bcrypt.generate_password_hash(value)
@@ -37,8 +31,9 @@ class CreateUserShema(pydantic.BaseModel):
 
     @pydantic.validator('email')
     def check_mail(cls, value: str):
-        if not re.search(self.email_regex, value):
+        if not re.search(email_regex, value):
             raise ValueError('invalid email')
+        return value
 
 
 class PatchUserShema(pydantic.BaseModel):
@@ -61,6 +56,7 @@ class PatchUserShema(pydantic.BaseModel):
         value = value.decode()
         return value
 
+
 def validate(data_to_validate: dict, validation_class: Type[CreateUserShema] | Type[PatchUserShema]):
     try:
         return validation_class(**data_to_validate).dict(exclude_none=True)
@@ -69,9 +65,9 @@ def validate(data_to_validate: dict, validation_class: Type[CreateUserShema] | T
 
 
 class CreateAdsShema(pydantic.BaseModel):
-    title: Optional[str]
-    content: Optional[str]
-
+    title: str
+    content: str
+    user_id: int
 
     @pydantic.validator('title')
     def check_title(cls, value: str):
@@ -85,10 +81,18 @@ class CreateAdsShema(pydantic.BaseModel):
             raise ValueError('ad content is too short')
         return value
 
+    @pydantic.validator('user_id')
+    def check_user_id(cls, value: int):
+        if not isinstance(value, int):
+            raise ValueError('integer only')
+        return value
+
+
 class PatchAdsShema(pydantic.BaseModel):
 
     title: Optional[str]
     content: Optional[str]
+    user_id: Optional[int]
 
     @pydantic.validator('title')
     def check_name(cls, value: str):
@@ -102,8 +106,14 @@ class PatchAdsShema(pydantic.BaseModel):
             raise ValueError('ad content is too short')
         return value
 
+    @pydantic.validator('user_id')
+    def check_user_id(cls, value: int):
+        if not isinstance(value, int):
+            raise ValueError('integer only')
+        return value
 
-def validate(data_to_validate: dict, validation_class: Type[CreateAdsShema] | Type[PatchAdsShema]):
+
+def validate_ads(data_to_validate: dict, validation_class: Type[CreateAdsShema] | Type[PatchAdsShema]):
     try:
         return validation_class(**data_to_validate).dict(exclude_none=True)
     except pydantic.ValidationError as err:
