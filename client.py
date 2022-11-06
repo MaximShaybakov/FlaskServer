@@ -1,11 +1,11 @@
 import requests
 
-data = requests.get('http://127.0.0.1:5000/user/3')
+# data = requests.get('http://127.0.0.1:5000/user/1')
 
-# data = requests.post('http://127.0.0.1:5000/user/', json={'name': 'Kolya',
-#                                                            'password': 'jkhglkj^&*785HJjhg',
-#                                                            'email': 'kolya@mail.ru',
-#                                                           })
+data = requests.post('http://127.0.0.1:5000/user/', json={'name': 'Vasya',
+                                                           'password': 'jkhglkj^&*785HJjhg',
+                                                           'email': 'vasya@mail.ru',
+                                                          })
 # data = requests.patch('http://127.0.0.1:5000/user/', json={'email': 'kolya@mail.ru'})
 #
 #
