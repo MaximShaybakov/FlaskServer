@@ -48,7 +48,7 @@ class UserView(MethodView):
             if obj_user.name != request.json['name']:
                 raise HttpError(403, 'Forbidden') # check name
             if not bcrypt.check_password_hash(obj_user.password, request.json["password"]):
-                raise HttpError(403, 'Forbidden') #check pass
+                raise HttpError(403, 'Invalid password') #check pass
             user = get_user_id(user_id, User, session)
             for fields, value in data_to_patch.items():
                 setattr(user, fields, value)
@@ -64,7 +64,7 @@ class UserView(MethodView):
             if obj_user.name != request.json['username']:
                 raise HttpError(403, 'Forbidden')
             if not bcrypt.check_password_hash(obj_user.password, request.json["password"]):
-                raise HttpError(403, 'Forbidden')
+                raise HttpError(403, 'Invalid password')
             user = get_user_id(user_id, User, session)
             session.delete(user)
             session.commit()
@@ -112,7 +112,7 @@ class AdsView(MethodView):
             if obj_user.name != request.json['username']:
                 raise HttpError(403, 'Forbidden')
             if not bcrypt.check_password_hash(obj_user.password, request.json["password"]):
-                raise HttpError(403, 'Forbidden')
+                raise HttpError(403, 'Invalid password')
             ads = get_ads_id(ads_id, Ads, session)
             for fields, value in data_to_patch.items():
                 setattr(ads, fields, value)
@@ -131,7 +131,7 @@ class AdsView(MethodView):
             if obj_user.name != request.json['username']:
                 raise HttpError(403, 'Forbidden')
             if not bcrypt.check_password_hash(obj_user.password, request.json["password"]):
-                raise HttpError(403, 'Forbidden')
+                raise HttpError(403, 'Invalid password')
             ads = get_user_id(ads_id, Ads, session)
             session.delete(ads)
             session.commit()
