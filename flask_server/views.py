@@ -5,6 +5,7 @@ from validators import Type, validate, CreateAdsShema, CreateUserShema, \
     PatchAdsShema, PatchUserShema
 from sqlalchemy.exc import IntegrityError
 from flask import jsonify, request
+from gen_variables import bcrypt
 
 
 def get_user_id(user_id: int, orm_model: Type[User], session: Session):
@@ -80,17 +81,39 @@ class AdsView(MethodView):
                 raise HttpError(409, 'this advertisement already exists')
             return jsonify(status='OK', ads_id=new_ads.id)
 
-    def patch(self, ads_id):
+    def patch(self, ads_id: int):
         data_to_patch = validate(request.json, PatchAdsShema)
         with Session() as session:
+            try:
+                obj_ads = session.query(Ads).get(ads_id).user_id
+            except AttributeError:
+                raise HttpError(404, 'Not found')
+            obj_user = session.query(User).get(obj_ads)
+            if not obj_user.id:
+                raise HttpError(404, 'Username not found')
+            if not obj_user.name == request.json['username']:
+                raise HttpError(403, 'Forbidden')
+            if not bcrypt.check_password_hash(obj_user.password, request.json["password"]): # сверка пароля владельца и юзера
+                raise HttpError(403, 'Forbidden')
             ads = get_ads_id(ads_id, Ads, session)
             for fields, value in data_to_patch.items():
                 setattr(ads, fields, value)
             session.commit()
-            return jsonify(title=ads.title, status='success')
+            return jsonify(title=ads.title, status=f'success')
 
     def delete(self, ads_id: int):
         with Session() as session:
+            try:
+                obj_ads = session.query(Ads).get(ads_id).user_id
+            except AttributeError:
+                raise HttpError(404, 'Not found')
+            obj_user = session.query(User).get(obj_ads)
+            if not obj_user.id:
+                raise HttpError(404, 'Username not found')
+            if not obj_user.name == request.json['username']:
+                raise HttpError(403, 'Forbidden')
+            if not bcrypt.check_password_hash(obj_user.password, request.json["password"]): # сверка пароля владельца и юзера
+                raise HttpError(403, 'Forbidden')
             ads = get_user_id(ads_id, Ads, session)
             session.delete(ads)
             session.commit()
