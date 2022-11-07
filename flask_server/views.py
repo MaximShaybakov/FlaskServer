@@ -17,6 +17,7 @@ def get_user_id(user_id: int, orm_model: Type[User], session: Session):
 
 
 class UserView(MethodView):
+    '''GET, CREATE, PATCH, DELETE users'''
 
     def get(self, user_id: int):
         with Session() as session:
@@ -26,6 +27,7 @@ class UserView(MethodView):
                            user_email=user.email)
 
     def post(self):
+        '''create user'''
         json_data = request.json
         with Session() as session:
             try:
@@ -42,11 +44,11 @@ class UserView(MethodView):
             try:
                 obj_user = session.query(User).get(user_id)
             except AttributeError:
-                raise HttpError(404, 'user not found')
+                raise HttpError(404, 'user not found') # checking if the user exists in the database
             if obj_user.name != request.json['name']:
-                raise HttpError(403, 'Forbidden')
+                raise HttpError(403, 'Forbidden') # check name
             if not bcrypt.check_password_hash(obj_user.password, request.json["password"]):
-                raise HttpError(403, 'Forbidden')
+                raise HttpError(403, 'Forbidden') #check pass
             user = get_user_id(user_id, User, session)
             for fields, value in data_to_patch.items():
                 setattr(user, fields, value)
@@ -109,7 +111,7 @@ class AdsView(MethodView):
                 raise HttpError(404, 'Username not found')
             if obj_user.name != request.json['username']:
                 raise HttpError(403, 'Forbidden')
-            if not bcrypt.check_password_hash(obj_user.password, request.json["password"]): # сверка пароля владельца и юзера
+            if not bcrypt.check_password_hash(obj_user.password, request.json["password"]):
                 raise HttpError(403, 'Forbidden')
             ads = get_ads_id(ads_id, Ads, session)
             for fields, value in data_to_patch.items():

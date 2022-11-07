@@ -7,8 +7,7 @@ import requests
 #                                                            'email': 'ork@mail.ru',
 #                                                           })
 data = requests.patch('http://127.0.0.1:5000/user/9', json={'name': 'Ork',
-                                                           'password': '*&56ttGhjgjku_',
-                                                            'username': 'Jora'})
+                                                           'password': '*&56ttGhjgjku_'})
 #
 #
 # data = requests.delete('http://127.0.0.1:5000/user/5')
