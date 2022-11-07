@@ -73,7 +73,7 @@ class AdsView(MethodView):
         json_data = request.json
         with Session() as session:
             try:
-                new_ads = Ads(**validate_ads(json_data, CreateAdsShema))
+                new_ads = Ads(**validate(json_data, CreateAdsShema))
                 session.add(new_ads)
                 session.commit()
             except IntegrityError:
@@ -81,7 +81,7 @@ class AdsView(MethodView):
             return jsonify(status='OK', ads_id=new_ads.id)
 
     def patch(self, ads_id):
-        data_to_patch = validate_ads(request.json, PatchAdsShema)
+        data_to_patch = validate(request.json, PatchAdsShema)
         with Session() as session:
             ads = get_ads_id(ads_id, Ads, session)
             for fields, value in data_to_patch.items():
