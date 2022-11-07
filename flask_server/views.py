@@ -21,7 +21,8 @@ class UserView(MethodView):
         with Session() as session:
             user = get_user_id(user_id, User, session)
             return jsonify(user_id=user.id,
-                           user_name=user.name)
+                           user_name=user.name,
+                           user_email=user.email)
 
     def post(self):
         json_data = request.json
@@ -41,7 +42,7 @@ class UserView(MethodView):
             for fields, value in data_to_patch.items():
                 setattr(user, fields, value)
             session.commit()
-            return jsonify(user=user.id, status='success')
+            return jsonify(user=user.id, status='success', user_email=user.email)
 
     def delete(self, user_id: int):
         with Session() as session:
