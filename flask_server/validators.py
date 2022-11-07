@@ -114,7 +114,7 @@ class PatchAdsShema(pydantic.BaseModel):
         return value
 
 
-def validate_ads(data_to_validate: dict, validation_class: Type[CreateAdsShema] | Type[PatchAdsShema]):
+def validate(data_to_validate: dict, validation_class: Type[CreateAdsShema] | Type[PatchAdsShema]):
     try:
         return validation_class(**data_to_validate).dict(exclude_none=True)
     except pydantic.ValidationError as err:
