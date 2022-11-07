@@ -39,14 +39,30 @@ class UserView(MethodView):
     def patch(self, user_id):
         data_to_patch = validate(request.json, PatchUserShema)
         with Session() as session:
+            try:
+                obj_user = session.query(User).get(user_id)
+            except AttributeError:
+                raise HttpError(404, 'user not found')
+            if obj_user.name != request.json['name']:
+                raise HttpError(403, 'Forbidden')
+            if not bcrypt.check_password_hash(obj_user.password, request.json["password"]):
+                raise HttpError(403, 'Forbidden')
             user = get_user_id(user_id, User, session)
             for fields, value in data_to_patch.items():
                 setattr(user, fields, value)
             session.commit()
-            return jsonify(user=user.id, status='success', user_email=user.email)
+            return jsonify(user=user.id, status='success')
 
     def delete(self, user_id: int):
         with Session() as session:
+            try:
+                obj_user = session.query(User).get(user_id)
+            except AttributeError:
+                raise HttpError(404, 'user not found')
+            if obj_user.name != request.json['username']:
+                raise HttpError(403, 'Forbidden')
+            if not bcrypt.check_password_hash(obj_user.password, request.json["password"]):
+                raise HttpError(403, 'Forbidden')
             user = get_user_id(user_id, User, session)
             session.delete(user)
             session.commit()
@@ -91,7 +107,7 @@ class AdsView(MethodView):
             obj_user = session.query(User).get(obj_ads)
             if not obj_user.id:
                 raise HttpError(404, 'Username not found')
-            if not obj_user.name == request.json['username']:
+            if obj_user.name != request.json['username']:
                 raise HttpError(403, 'Forbidden')
             if not bcrypt.check_password_hash(obj_user.password, request.json["password"]): # сверка пароля владельца и юзера
                 raise HttpError(403, 'Forbidden')
@@ -110,9 +126,9 @@ class AdsView(MethodView):
             obj_user = session.query(User).get(obj_ads)
             if not obj_user.id:
                 raise HttpError(404, 'Username not found')
-            if not obj_user.name == request.json['username']:
+            if obj_user.name != request.json['username']:
                 raise HttpError(403, 'Forbidden')
-            if not bcrypt.check_password_hash(obj_user.password, request.json["password"]): # сверка пароля владельца и юзера
+            if not bcrypt.check_password_hash(obj_user.password, request.json["password"]):
                 raise HttpError(403, 'Forbidden')
             ads = get_user_id(ads_id, Ads, session)
             session.delete(ads)
