@@ -1,7 +1,7 @@
 from data_base.models import User, Ads, Session
 from errors import HttpError
 from flask.views import MethodView
-from validators import Type, validate, validate_ads, CreateAdsShema, CreateUserShema, \
+from validators import Type, validate, CreateAdsShema, CreateUserShema, \
     PatchAdsShema, PatchUserShema
 from sqlalchemy.exc import IntegrityError
 from flask import jsonify, request
