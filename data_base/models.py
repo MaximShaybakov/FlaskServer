@@ -1,11 +1,11 @@
 from sqlalchemy import Column, String, Integer, DateTime, Text, \
-    create_engine, func
+    create_engine, func, Boolean
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 
-DSN = 'postgresql://app:1234@127.0.0.1:5431/netology'
+DSN = 'postgresql://app:1234@127.0.0.1:5431/test_db'
 
 engine = create_engine(DSN)
 Base = declarative_base()
@@ -18,6 +18,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False, unique=True)
+    admin = Column(Boolean)
     creation_time = Column(DateTime, server_default=func.now())
     password = Column(String(100), nullable=False)
     email = Column(String(30), nullable=True)
@@ -40,3 +41,5 @@ class Ads(Base):
 
     def __repr__(self):
         return f'Ads "{self.title[:20]}"'
+
+
